@@ -1,7 +1,9 @@
 - docker build command
 
 ```shell
-DOCKER_BUILDKIT=1 docker build --no-cache -t kestr31/airsim-ros2:<tag> .
+DOCKER_BUILDKIT=1 \
+docker build --no-cache \
+-t kestr31/airsim-ros2:<tag> .
 ```
 
 - docker run command
