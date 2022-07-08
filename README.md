@@ -1,6 +1,12 @@
+- docker build command
+
+```shell
+DOCKER_BUILDKIT=1 docker build --no-cache -t kestr31/airsim-ros2:<tag> .
+```
+
 - docker run command
 
-```
+```shell
 docker run -it --rm \
 -e DISPLAY=$DISPLAY \
 -e QT_NO_MITSHM=1 \
