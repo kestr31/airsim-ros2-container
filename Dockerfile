@@ -16,11 +16,10 @@ FROM ${BASEIMAGE}:${BASETAG} as stage_airsim
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 ENV \
-	DEBIAN_FRONTEND=noninteractive \
-	LANG=C.UTF-8 \
-	LC_ALL=C.UTF-8 \
-	simhost=localhost \
-	rebuild=false
+	DEBIAN_FRONTEND noninteractive \
+	LANG C.UTF-8 \
+	LC_ALL C.UTF-8 \
+	simhost localhost
 
 RUN git clone https://github.com/microsoft/AirSim.git -b v1.8.0-linux /root/AirSim \
 	&& /root/AirSim/setup.sh \
@@ -30,6 +29,21 @@ RUN git clone https://github.com/microsoft/AirSim.git -b v1.8.0-linux /root/AirS
 FROM ${BASEIMAGE}:${BASETAG} as stage_final_run
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+COPY --from=stage_airsim /root/AirSim/AirLib /root/AirSim/AirLib
+COPY --from=stage_airsim /root/AirSim/MavLinkCom /root/AirSim/MavLinkCom
+COPY --from=stage_airsim /root/AirSim/cmake /root/AirSim/cmake
+COPY --from=stage_airsim /root/AirSim/external /root/AirSim/external
+COPY --from=stage_airsim /root/AirSim/ros2 /root/AirSim/ros2
+
+ENV \
+	DEBIAN_FRONTEND=noninteractive \
+	LANG=C.UTF-8 \
+	LC_ALL=C.UTF-8 \
+	simhost=localhost \
+	rebuild=false \
+	QT_NO_MITSHM=1 \
+	XDG_RUNTIME_DIR=/run/user/0
 
 RUN \
     --mount=type=cache,target=/var/cache/apt,from=stage_apt,source=/var/cache/apt \
