@@ -4,6 +4,8 @@ ARG BASETAG=galactic-ros-base
 
 FROM ${BASEIMAGE}:${BASETAG} as stage_apt
 
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
 RUN rm -f /etc/apt/apt.conf.d/docker-clean \
 	&& echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache \
 	&& apt-get update
@@ -11,13 +13,13 @@ RUN rm -f /etc/apt/apt.conf.d/docker-clean \
 
 FROM ${BASEIMAGE}:${BASETAG} as stage_airsim
 
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
 ENV \
 	DEBIAN_FRONTEND noninteractive \
 	LANG C.UTF-8 \
 	LC_ALL C.UTF-8 \
 	simhost localhost
- 
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 RUN git clone https://github.com/microsoft/AirSim.git -b v1.8.0-linux /root/AirSim \
 	&& /root/AirSim/setup.sh \
@@ -26,6 +28,8 @@ RUN git clone https://github.com/microsoft/AirSim.git -b v1.8.0-linux /root/AirS
 
 FROM ${BASEIMAGE}:${BASETAG} as stage_final_run
 
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
 COPY --from=stage_airsim /root/AirSim/AirLib /root/AirSim/AirLib
 COPY --from=stage_airsim /root/AirSim/MavLinkCom /root/AirSim/MavLinkCom
 COPY --from=stage_airsim /root/AirSim/cmake /root/AirSim/cmake
@@ -33,11 +37,11 @@ COPY --from=stage_airsim /root/AirSim/external /root/AirSim/external
 COPY --from=stage_airsim /root/AirSim/ros2 /root/AirSim/ros2
 
 ENV \
-	DEBIAN_FRONTEND noninteractive \
-	LANG C.UTF-8 \
-	LC_ALL C.UTF-8 \
-	simhost localhost \
-	rebuild false
+	DEBIAN_FRONTEND=noninteractive \
+	LANG=C.UTF-8 \
+	LC_ALL=C.UTF-8 \
+	simhos=localhost \
+	rebuild=false
 
 RUN \
     --mount=type=cache,target=/var/cache/apt,from=stage_apt,source=/var/cache/apt \
@@ -53,7 +57,6 @@ RUN \
 WORKDIR /root/AirSim/ros2
 
 RUN source /opt/ros/galactic/setup.bash \
-	&& echo 'source /root/AirSim/ros2/install/setup.bash' >> /root/.bashrc \
 	&& colcon build \
 		--cmake-args -DCMAKE_C_COMPILER=gcc-8 \
 		--cmake-args -DCMAKE_CXX_COMPILER=g++-8 \
