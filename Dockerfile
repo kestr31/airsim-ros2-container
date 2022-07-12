@@ -57,6 +57,7 @@ RUN \
 WORKDIR /root/AirSim/ros2
 
 RUN source /opt/ros/galactic/setup.bash \
+	&& echo 'source /opt/ros/galactic/setup.bash' >> /root/.bashrc \
 	&& colcon build \
 		--cmake-args -DCMAKE_C_COMPILER=gcc-8 \
 		--cmake-args -DCMAKE_CXX_COMPILER=g++-8 \
