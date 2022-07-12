@@ -89,6 +89,7 @@ ros2 topic list
 
 ## 4. Reference
 
-- [microsoft/AirSim/ros2/src](https://github.com/microsoft/AirSim/tree/main/ros2/src) (AirSim ROS2 package)
+- [AirSim Settings](https://microsoft.github.io/AirSim/settings/) (`settings.json`)
 - [accetto/ubuntu-vnc-xfce](https://github.com/accetto/ubuntu-vnc-xfce) (Multi-Stage Build)
 - [How to connect wsl to a windows localhost?](https://superuser.com/questions/1535269/how-to-connect-wsl-to-a-windows-localhost) (WSL2 Windows localhost access)
+- [microsoft/AirSim/ros2/src](https://github.com/microsoft/AirSim/tree/main/ros2/src) (AirSim ROS2 package)
