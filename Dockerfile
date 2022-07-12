@@ -16,32 +16,15 @@ FROM ${BASEIMAGE}:${BASETAG} as stage_airsim
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 ENV \
-	DEBIAN_FRONTEND noninteractive \
-	LANG C.UTF-8 \
-	LC_ALL C.UTF-8 \
-	simhost localhost
-
-RUN git clone https://github.com/microsoft/AirSim.git -b v1.8.0-linux /root/AirSim \
-	&& /root/AirSim/setup.sh \
-	&& /root/AirSim/build.sh
-
-
-FROM ${BASEIMAGE}:${BASETAG} as stage_final_run
-
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-
-COPY --from=stage_airsim /root/AirSim/AirLib /root/AirSim/AirLib
-COPY --from=stage_airsim /root/AirSim/MavLinkCom /root/AirSim/MavLinkCom
-COPY --from=stage_airsim /root/AirSim/cmake /root/AirSim/cmake
-COPY --from=stage_airsim /root/AirSim/external /root/AirSim/external
-COPY --from=stage_airsim /root/AirSim/ros2 /root/AirSim/ros2
-
-ENV \
 	DEBIAN_FRONTEND=noninteractive \
 	LANG=C.UTF-8 \
 	LC_ALL=C.UTF-8 \
 	simhost=localhost \
 	rebuild=false
+
+RUN git clone https://github.com/microsoft/AirSim.git -b v1.8.0-linux /root/AirSim \
+	&& /root/AirSim/setup.sh \
+	&& /root/AirSim/build.sh
 
 RUN \
     --mount=type=cache,target=/var/cache/apt,from=stage_apt,source=/var/cache/apt \
@@ -52,7 +35,15 @@ RUN \
 		libyaml-cpp-dev \
 		ros-${ROS_DISTRO}-tf2-sensor-msgs \
 		ros-${ROS_DISTRO}-tf2-geometry-msgs \
-		ros-${ROS_DISTRO}-mavros*
+		ros-${ROS_DISTRO}-mavros* \
+		python3-pip \
+		python3-yaml \
+		python3-setuptools \
+		python3-colcon-common-extensions
+
+RUN \
+	pip install opencv-python msgpack-rpc-python flask numpy \
+	&& pip install airsim
 
 WORKDIR /root/AirSim/ros2
 
