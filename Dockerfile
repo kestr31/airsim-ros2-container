@@ -26,6 +26,11 @@ RUN git clone https://github.com/microsoft/AirSim.git -b v1.8.0-linux /root/AirS
 	&& /root/AirSim/setup.sh \
 	&& /root/AirSim/build.sh
 
+
+FROM ${BASEIMAGE}:${BASETAG} as stage_final_run
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
 RUN \
     --mount=type=cache,target=/var/cache/apt,from=stage_apt,source=/var/cache/apt \
     --mount=type=cache,target=/var/lib/apt,from=stage_apt,source=/var/lib/apt \
@@ -42,7 +47,11 @@ RUN \
 		python3-colcon-common-extensions
 
 RUN \
-	pip install opencv-python msgpack-rpc-python flask numpy \
+	pip install \
+		opencv-python \
+		msgpack-rpc-python \
+		flask \
+		numpy \
 	&& pip install airsim
 
 WORKDIR /root/AirSim/ros2
